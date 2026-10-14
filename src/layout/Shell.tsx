@@ -9,9 +9,9 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
 
   return (
     <>
-      <header>
+      <header className="app-header">
         <h1>Amaranta Shop</h1>
-        <nav aria-label="Principal">
+        <nav aria-label="Principal" className="app-nav">
           <NavLink to="/" end>
             Inicio
           </NavLink>
@@ -21,7 +21,7 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
             </NavLink>
           ))}
         </nav>
-        <div>
+        <div className="app-session">
           {session ? (
             <>
               <span>Rol: {session.role ?? 'sin rol'}</span>
@@ -34,7 +34,7 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
           )}
         </div>
       </header>
-      <main>
+      <main className="app-main">
         <Outlet />
       </main>
     </>
