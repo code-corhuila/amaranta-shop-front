@@ -35,8 +35,9 @@ It talks to one server only, `amaranta-shop-api-gateway`, and it is the only pla
 ## Stack
 
 **React 19, Vite, TypeScript in strict mode, Vitest and Module Federation** (`@module-federation/vite`), on Node 22. Annex H
-allows React 19 or Angular 21; React was chosen because the monolith's web is already React. That choice still has to be
-recorded in an ADR in `amaranta-shop-docs`.
+allows React 19 or Angular 21; React was chosen because the monolith's web is already React, and the choice is recorded in
+ADR-014 of `amaranta-shop-docs`. The type is Fredoka and Inter, self-hosted from npm (`@fontsource-variable`): no request
+leaves for a third party.
 
 ## What the shell does for every portal
 
@@ -51,9 +52,20 @@ recorded in an ADR in `amaranta-shop-docs`.
 | The text a person reads is decided in one function by status; what a service wrote for a developer is never shown | `userMessageFor` |
 | The session: reads `sub`, `role` and `exp` of the token, never verifies it (every service does), survives a reload, ends when the token expires | `src/core/auth/session.ts` |
 | A route that needs a person goes to the sign-in and comes back to where it was going | `RequireAuth.tsx` |
+| **A portal may ask who is signed in, never hold the token**: `shell/auth` lends `useSessionInfo()` (role and subject) and `RequireRole`, which sends a visitor to the sign-in and tells another role it has no permission | `src/core/auth/exposed.ts` |
+| The look is the design system of `amaranta-shop-docs` (ADR-007 "Fiery Ocean"): its tokens are global custom properties, and base styles cover the elements and roles the screens use, so a portal needs a class only for what is its own | `src/styles/` |
 | **A portal that is down does not take the application down**: one boundary per portal, a retry, and the rest keeps working | `RemoteBoundary.tsx`, `RemotePortal.tsx` |
 | Portals are downloaded when their route is opened (`shareStrategy: 'loaded-first'`), not at start | `vite.config.ts` |
 | `remoteEntry.js` is never cached; hashed files are cached for a year; a missing file is a `404`, not the page | `deploy/nginx.conf` |
+
+### The look, and what the design system never audited
+
+`src/styles/tokens.css` holds the colours, type, radii and shadow of `12-ux-ui/design-system.md`. That document says its
+contrast was never audited; it was, and two pairs failed WCAG AA for text (white on `ocean-500`, 3.3:1; the error red on
+white, 3.8:1) and two borders failed 3:1 for a control (a field's 15% ink border, 1.3:1; the secondary button's `ember-300`,
+2.2:1). Each semantic token takes the next tone of the same palette that passes. `src/styles/design.test.ts` checks that the
+brand colours are the ones the design system names and that every pair the components draw is readable, and it fails if the
+original values come back.
 
 ### The development sign-in
 
@@ -96,14 +108,14 @@ Then open `http://localhost:4200`. With no portal running, `/catalog` and `/sale
 
 ## Status
 
-The shell is complete as Annex H describes it, with **70 tests** and a verified build, and it was opened in a browser with a
-portal switched off. Not done:
+The shell is complete as Annex H describes it, with **113 tests** and a verified build. It has been opened in a browser with a
+portal switched off, and with the real catalog portal loaded into it behind the real gateway and the real `catalog-api`
+(`scripts/e2e-real-stack.sh` in `amaranta-shop-catalog-portal`). Not done:
 
-- **The portals.** Neither `catalog-portal` nor `sales-portal` has code yet, so no portal has been loaded for real; the
-  loading is tested with doubles and the failure with a real browser. The four states of a screen, the `Idempotency-Key`
-  per intention, and money from text belong to the portals' screens.
-- **Appearance.** The shell has no styles: it is structure and behaviour. The monolith's web uses Tailwind.
-- **The ADR** that records the choice of React.
+- **The sales portal** has no code yet. The catalog portal is done; the `Idempotency-Key` per intention and the checkout belong
+  to the sales portal's screens.
+- **No Tailwind.** The design system was written against Tailwind classes; here its tokens are plain CSS custom properties,
+  which is what ADR-007 asked for ("a token-level change").
 - **Refreshing the session.** The access token lasts 15 minutes; renewing it with the refresh token belongs to the identity
   portal, which does not exist yet.
 - **Where the portals live** (`localhost:4201` and `4202`) is written for development in `vite.config.ts`.
