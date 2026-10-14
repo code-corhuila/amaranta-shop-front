@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 /**
  * Module Federation (Annex H, React). The shell is the host: it loads each portal when its route is opened, and it LENDS
  * the portals its HTTP client as `shell/apiClient`, so a portal never makes one of its own (which would send requests with
- * no token). Where the portals live is configuration of the shell and is written only here.
+ * no token), and `shell/auth`, so a screen can ask who is signed in without ever holding the token. Where the portals live is configuration of the shell and is written only here.
  */
 export default defineConfig({
   plugins: [
@@ -13,7 +13,10 @@ export default defineConfig({
     federation({
       name: 'shell',
       filename: 'remoteEntry.js',
-      exposes: { './apiClient': './src/core/http/exposed.ts' },
+      exposes: {
+        './apiClient': './src/core/http/exposed.ts',
+        './auth': './src/core/auth/exposed.ts',
+      },
       remotes: {
         catalogPortal: { type: 'module', name: 'catalogPortal', entry: 'http://localhost:4201/remoteEntry.js' },
         salesPortal: { type: 'module', name: 'salesPortal', entry: 'http://localhost:4202/remoteEntry.js' },
