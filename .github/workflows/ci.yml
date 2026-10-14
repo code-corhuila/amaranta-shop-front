@@ -21,7 +21,7 @@ jobs:
 
       - name: The repository has its minimum content
         run: |
-          for file in README.md .github/CODEOWNERS .gitignore .env.example; do
+          for file in README.md .github/CODEOWNERS .gitignore .env.example package.json package-lock.json deploy/Dockerfile; do
             [ -f "$file" ] || { echo "missing $file"; exit 1; }
           done
 
@@ -31,3 +31,11 @@ jobs:
             echo "A real environment file or key is versioned"
             exit 1
           fi
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install from the lock file, type-check, test
+        run: bash scripts/test.sh
