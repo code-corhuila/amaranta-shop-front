@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import './styles/index.css';
 import { App } from './app/App';
 import { sessionStore } from './core/auth/sessionStore';
 import { SessionProvider } from './core/auth/SessionProvider';
