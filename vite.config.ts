@@ -16,6 +16,7 @@ export default defineConfig({
       exposes: {
         './apiClient': './src/core/http/exposed.ts',
         './auth': './src/core/auth/exposed.ts',
+        './cart': './src/core/cart/exposed.ts',
       },
       remotes: {
         catalogPortal: { type: 'module', name: 'catalogPortal', entry: 'http://localhost:4201/remoteEntry.js' },
