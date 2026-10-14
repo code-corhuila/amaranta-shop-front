@@ -9,3 +9,9 @@ RUN npm ci
 FROM deps AS test
 COPY . .
 RUN npm run typecheck && npm test
+
+# The production build: the type check, then the bundle with Module Federation.
+FROM deps AS build
+COPY . .
+# remoteEntry.js is what lets a portal borrow shell/apiClient: a build without it must not pass.
+RUN npm run typecheck && npm run build && test -f dist/remoteEntry.js
