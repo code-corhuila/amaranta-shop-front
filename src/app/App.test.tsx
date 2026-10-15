@@ -49,6 +49,21 @@ describe('App', () => {
     expect(within(link).getByText('3')).toBeInTheDocument();
   });
 
+  it('marks the cart link as the place a product flies to, so a portal can animate toward it without knowing the shell', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(screen.getByRole('link', { name: 'Carrito' })).toHaveAttribute('data-cart-target');
+  });
+
+  it('draws the count again every time it changes, so that it can jump when the product lands', () => {
+    const cart = createCartStore({ storage: null });
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    act(() => void cart.add(croquetas));
+    const first = within(screen.getByRole('link', { name: 'Carrito, 1 producto' })).getByText('1');
+    act(() => void cart.add(croquetas));
+    const second = within(screen.getByRole('link', { name: 'Carrito, 2 productos' })).getByText('2');
+    expect(second).not.toBe(first);
+  });
+
   it('has no cart where there is no sales portal to take it to', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' })]);
     expect(screen.queryByRole('link', { name: /^Carrito/ })).not.toBeInTheDocument();
