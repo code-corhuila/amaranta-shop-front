@@ -49,6 +49,12 @@
   --radius-xl2: 20px;
   --radius-full: 9999px;
   --shadow-card: 0 8px 24px -8px rgba(61, 7, 9, 0.2);
+  /* Deeper shadows for what lifts: a card under the pointer, the checkout wizard. Same tint as the card shadow. */
+  --shadow-lift: 0 22px 44px -14px rgba(61, 7, 9, 0.38);
+  --shadow-wizard: 0 28px 64px -24px rgba(61, 7, 9, 0.45);
+  /* The two gradients. The primary one stays in ember-600 to ember-500, where white text is 6:1 or better. */
+  --gradient-primary: linear-gradient(135deg, var(--color-ember-600), var(--color-ember-500));
+  --gradient-hero: linear-gradient(120deg, var(--color-ocean-700) 0%, var(--color-ocean-600) 60%, var(--color-ocean-500) 100%);
 
   /* Semantic */
   --surface: #ffffff;

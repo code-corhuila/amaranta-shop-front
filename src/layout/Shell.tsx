@@ -27,9 +27,15 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
         </nav>
         <div className="app-session">
           {sales && (
-            <Link to={`${sales.path}/cart`} className="cart-link" aria-label={count === 0 ? 'Carrito' : `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}`}>
+            // data-cart-target: where a product flies to when it is added (the catalog portal looks for this attribute).
+            <Link to={`${sales.path}/cart`} className="cart-link" data-cart-target aria-label={count === 0 ? 'Carrito' : `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}`}>
               Carrito
-              {count > 0 && <span className="cart-count">{count}</span>}
+              {/* The key makes the badge a new element each time the count changes, so its animation plays again. */}
+              {count > 0 && (
+                <span key={count} className="cart-count">
+                  {count}
+                </span>
+              )}
             </Link>
           )}
           {session ? (
