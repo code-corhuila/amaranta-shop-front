@@ -1,0 +1,5 @@
+/* Fredoka for what the brand says, Inter for what is read. Self-hosted: no request leaves for a third party's server. */
+@import '@fontsource-variable/fredoka/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+@import './tokens.css';
+@import './base.css';
