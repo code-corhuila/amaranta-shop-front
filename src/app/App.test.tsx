@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSessionStore } from '../core/auth/session';
 import { SessionProvider } from '../core/auth/SessionProvider';
 import { NOW_SECONDS, validToken } from '../core/auth/testTokens';
+import { createCartStore, type CartStore } from '../core/cart/cart';
+import { CartProvider } from '../core/cart/CartProvider';
 import type { RemoteDefinition } from '../remotes/types';
 import { App } from './App';
 
@@ -15,21 +17,42 @@ function remote(overrides: Partial<RemoteDefinition> & Pick<RemoteDefinition, 'i
   return { label: overrides.id, path: `/${overrides.id}`, requiresSession: false, load: () => Promise.resolve(page(`Portal ${overrides.id}`)), ...overrides };
 }
 
-function renderApp(remotes: RemoteDefinition[], path = '/') {
+function renderApp(remotes: RemoteDefinition[], path = '/', cart: CartStore = createCartStore({ storage: null })) {
   const session = createSessionStore({ storage: null, now: () => NOW_SECONDS * 1000 });
   render(
     <SessionProvider store={session}>
-      <MemoryRouter initialEntries={[path]}>
-        <App remotes={remotes} />
-      </MemoryRouter>
+      <CartProvider store={cart}>
+        <MemoryRouter initialEntries={[path]}>
+          <App remotes={remotes} />
+        </MemoryRouter>
+      </CartProvider>
     </SessionProvider>,
   );
   return session;
 }
 
+const croquetas = { productId: 'p-1', name: 'Croquetas', price: 189_000, priceFormatted: '$ 189.000', imageUrl: null };
+
 describe('App', () => {
   beforeEach(() => vi.spyOn(console, 'error').mockImplementation(() => undefined));
   afterEach(() => vi.restoreAllMocks());
+
+  it('shows the cart beside who is signed in, with how many units it holds, said in words for a screen reader', () => {
+    const cart = createCartStore({ storage: null });
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    expect(screen.getByRole('link', { name: 'Carrito' })).toHaveAttribute('href', '/sales/cart');
+
+    act(() => void cart.add(croquetas));
+    expect(screen.getByRole('link', { name: 'Carrito, 1 producto' })).toBeInTheDocument();
+    act(() => void cart.add(croquetas, 2));
+    const link = screen.getByRole('link', { name: 'Carrito, 3 productos' });
+    expect(within(link).getByText('3')).toBeInTheDocument();
+  });
+
+  it('has no cart where there is no sales portal to take it to', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' })]);
+    expect(screen.queryByRole('link', { name: /^Carrito/ })).not.toBeInTheDocument();
+  });
 
   it('names the application and offers each portal in the navigation', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);

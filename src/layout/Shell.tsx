@@ -1,11 +1,15 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useSession, useSessionStore } from '../core/auth/SessionProvider';
+import { useCart } from '../core/cart/useCart';
 import type { RemoteDefinition } from '../remotes/types';
 
 /** What every screen shares: the name, the navigation, who is signed in, and the place where a portal is drawn. */
 export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
   const session = useSession();
   const store = useSessionStore();
+  const { count } = useCart();
+  // The cart is taken to the sales portal, wherever the registry mounts it.
+  const sales = remotes.find((remote) => remote.id === 'sales');
 
   return (
     <>
@@ -22,6 +26,12 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
           ))}
         </nav>
         <div className="app-session">
+          {sales && (
+            <Link to={`${sales.path}/cart`} className="cart-link" aria-label={count === 0 ? 'Carrito' : `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}`}>
+              Carrito
+              {count > 0 && <span className="cart-count">{count}</span>}
+            </Link>
+          )}
           {session ? (
             <>
               <span>Rol: {session.role ?? 'sin rol'}</span>
