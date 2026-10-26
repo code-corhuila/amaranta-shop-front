@@ -15,3 +15,12 @@ FROM deps AS build
 COPY . .
 # remoteEntry.js is what lets a portal borrow shell/apiClient: a build without it must not pass.
 RUN npm run typecheck && npm run build && test -f dist/remoteEntry.js
+
+# What ships: static files behind nginx, and nothing from node_modules. It is the LAST stage, so a plain
+# `docker build` produces this one.
+FROM nginx:1.27-alpine AS serve
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+COPY deploy/shell-headers.conf /etc/nginx/snippets/shell-headers.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 4200
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD wget -qO- http://127.0.0.1:4200/health || exit 1
