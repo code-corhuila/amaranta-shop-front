@@ -53,6 +53,8 @@ leaves for a third party.
 | The session: reads `sub`, `role` and `exp` of the token, never verifies it (every service does), survives a reload, ends when the token expires | `src/core/auth/session.ts` |
 | A route that needs a person goes to the sign-in and comes back to where it was going | `RequireAuth.tsx` |
 | **A portal may ask who is signed in, never hold the token**: `shell/auth` lends `useSessionInfo()` (role and subject) and `RequireRole`, which sends a visitor to the sign-in and tells another role it has no permission | `src/core/auth/exposed.ts` |
+| **The cart belongs to the shell, because two portals use it**: the catalog adds to it and sales buys from it. `shell/cart` lends `useCart()` and the 50-unit limit of a line; the menu shows how many units it holds. It keeps what a person chose (the name and the price they saw), never a total (the service's), in whole pesos, deduplicated by product, and cleans what the browser kept if it was damaged or edited by hand | `src/core/cart/` |
+| `shell/auth` also lends `RequireAuth`; a test fails the build when a name is added to what the shell lends (`shell/auth`, `shell/cart`), so the surface cannot grow by accident | `src/core/auth/exposed.test.ts` |
 | The look is the design system of `amaranta-shop-docs` (ADR-007 "Fiery Ocean"): its tokens are global custom properties, and base styles cover the elements and roles the screens use, so a portal needs a class only for what is its own | `src/styles/` |
 | **A portal that is down does not take the application down**: one boundary per portal, a retry, and the rest keeps working | `RemoteBoundary.tsx`, `RemotePortal.tsx` |
 | Portals are downloaded when their route is opened (`shareStrategy: 'loaded-first'`), not at start | `vite.config.ts` |
@@ -108,12 +110,11 @@ Then open `http://localhost:4200`. With no portal running, `/catalog` and `/sale
 
 ## Status
 
-The shell is complete as Annex H describes it, with **113 tests** and a verified build. It has been opened in a browser with a
-portal switched off, and with the real catalog portal loaded into it behind the real gateway and the real `catalog-api`
-(`scripts/e2e-real-stack.sh` in `amaranta-shop-catalog-portal`). Not done:
+The shell is complete as Annex H describes it, with **138 tests** and a verified build. It has been opened in a browser with a
+portal switched off, and with the whole system up: the real catalog and sales portals loaded into it behind the real gateway,
+`catalog-api` and `sales-api`, where a guest bought a product with the cart this shell lends to both portals
+(`scripts/e2e-real-stack.sh` in `amaranta-shop-sales-portal`). Not done:
 
-- **The sales portal** has no code yet. The catalog portal is done; the `Idempotency-Key` per intention and the checkout belong
-  to the sales portal's screens.
 - **No Tailwind.** The design system was written against Tailwind classes; here its tokens are plain CSS custom properties,
   which is what ADR-007 asked for ("a token-level change").
 - **Refreshing the session.** The access token lasts 15 minutes; renewing it with the refresh token belongs to the identity
