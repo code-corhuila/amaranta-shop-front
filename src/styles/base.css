@@ -431,3 +431,46 @@ textarea:focus {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---- the way in: sign in and create an account --------------------------------------------------------------- */
+.auth-card {
+  max-width: 26rem;
+  margin: 2rem auto;
+  padding: 1.75rem;
+  border-radius: var(--radius-xl2);
+  background: var(--surface);
+  box-shadow: var(--shadow-wizard);
+  border-top: 6px solid transparent;
+  border-image: var(--gradient-primary) 1;
+}
+
+.auth-card h2 {
+  margin: 1.25rem 0 0.25rem;
+  color: var(--brand-700);
+}
+
+.auth-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+  background: var(--brand-50);
+}
+
+.auth-switch button {
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+
+.auth-switch button[aria-pressed='true'] {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.auth-card form button[type='submit'] {
+  width: 100%;
+  margin-top: 0.5rem;
+}
