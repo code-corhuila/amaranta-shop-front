@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import { DevSignIn } from '../core/auth/DevSignIn';
 import { RequireAuth } from '../core/auth/RequireAuth';
+import { SignIn } from '../core/auth/SignIn';
 import { Home, NotFound } from '../layout/Pages';
 import { RemotePortal } from '../layout/RemotePortal';
 import { Shell } from '../layout/Shell';
@@ -15,7 +15,7 @@ export function App({ remotes }: { remotes: readonly RemoteDefinition[] }) {
     <Routes>
       <Route element={<Shell remotes={remotes} />}>
         <Route index element={<Home remotes={remotes} />} />
-        <Route path="sign-in" element={<DevSignIn />} />
+        <Route path="sign-in" element={<SignIn />} />
         {remotes.map((remote) => {
           const portal = <RemotePortal key={remote.id} remote={remote} />;
           return <Route key={remote.id} path={`${remote.path}/*`} element={remote.requiresSession ? <RequireAuth>{portal}</RequireAuth> : portal} />;
