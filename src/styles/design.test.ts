@@ -71,8 +71,20 @@ describe('the brand colours are the ones the design system names', () => {
     expect(value('--radius-full')).toBe('9999px');
   });
 
-  it('tints the shadow with the brand colour instead of pure black', () => {
-    expect(value('--shadow-card')).toBe('0 8px 24px -8px rgba(61, 7, 9, 0.2)');
+  it('tints the shadow with the ink of the brand instead of pure black', () => {
+    expect(value('--shadow-card')).toBe('0 8px 24px -8px rgba(14, 42, 61, 0.2)');
+  });
+
+  it('draws the brand with the ocean blue, because the shop took the colour the clinic was going to have', () => {
+    expect(value('--brand-500')).toBe(value('--color-ocean-600'));
+    expect(value('--brand-700')).toBe(value('--color-ocean-700'));
+    expect(value('--btn-primary-bg')).toBe(value('--color-ocean-600'));
+    expect(value('--link')).toBe(value('--color-ocean-700'));
+  });
+
+  it('keeps the warm red for the "Agregar" button and for the errors', () => {
+    expect(value('--btn-add-bg')).toBe(value('--color-ember-600'));
+    expect(value('--alert-error-text')).toBe(value('--color-ember-700'));
   });
 });
 
@@ -82,7 +94,9 @@ describe('every pair the components draw is readable (WCAG 2.2 AA)', () => {
     ['body text', '--color-ink-900', '--color-cream-50'],
     ['text on a white field', '--color-ink-900', '--surface'],
     ['muted text', '--color-ink-muted', '--color-cream-50'],
-    ['headings', '--color-ember-700', '--color-cream-50'],
+    ['headings', '--brand-700', '--color-cream-50'],
+    ['the name of the shop, over the white header', '--brand-700', '--surface'],
+    ['link on the white card', '--link', '--surface'],
     ['links', '--link', '--color-cream-50'],
     ['primary button', '--on-accent', '--btn-primary-bg'],
     ['primary button, hovered', '--on-accent', '--btn-primary-bg-hover'],
@@ -123,6 +137,13 @@ describe('the base styles keep the quality floor', () => {
     // Comments may say the word; what is checked is the CSS itself.
     const rules = `${tokensCss}${baseCss}`.replace(/\/\*[\s\S]*?\*\//g, '');
     expect(rules).not.toMatch(/#000(000)?\b|\bblack\b/i);
+  });
+
+  it('floats the cart at the right edge of the screen, as a round button, on every page', () => {
+    const rule = /\.cart-link\s*\{([^}]*)\}/.exec(baseCss)?.[1] ?? '';
+    expect(rule).toMatch(/position:\s*fixed/);
+    expect(rule).toMatch(/right:/);
+    expect(rule).toMatch(/border-radius:\s*var\(--radius-full\)/);
   });
 
   it('styles the roles the screens already use, so a portal needs no class for them', () => {

@@ -1,10 +1,19 @@
 import { Link } from 'react-router-dom';
+import type { RemoteDefinition } from '../remotes/types';
 
-export function Home() {
+/** The way in: a short welcome and one clear action, which is to see the catalog. */
+export function Home({ remotes }: { remotes: readonly RemoteDefinition[] }) {
+  const catalog = remotes.find((remote) => remote.id === 'catalog');
   return (
-    <section>
-      <h2>Bienvenido</h2>
-      <p>Elige un módulo en el menú para empezar.</p>
+    <section className="home-hero">
+      <p className="home-kicker">Tu tienda de mascotas</p>
+      <h2>Todo para tu mejor amigo</h2>
+      <p className="home-lead">Alimento, juguetes e higiene para tu perro o tu gato. Eliges, agregas al carrito y listo.</p>
+      {catalog && (
+        <Link to={catalog.path} className="btn btn-primary home-cta">
+          Ver el catálogo
+        </Link>
+      )}
     </section>
   );
 }
