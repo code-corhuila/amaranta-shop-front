@@ -77,6 +77,19 @@ describe('App', () => {
     expect(within(nav).getByRole('link', { name: 'Ventas' })).toHaveAttribute('href', '/sales');
   });
 
+  it('has no "Inicio" link: the name of the shop takes you home, and the welcome offers the catalog', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(within(screen.getByRole('navigation')).queryByRole('link', { name: 'Inicio' })).not.toBeInTheDocument();
+    expect(within(screen.getByRole('heading', { name: /amaranta shop/i })).getByRole('link')).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Ver el catálogo' })).toHaveAttribute('href', '/catalog');
+  });
+
+  it('keeps the cart out of the header, so it can float over every page', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(within(screen.getByRole('banner')).queryByRole('link', { name: 'Carrito' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Carrito' })).toBeInTheDocument();
+  });
+
   it('loads a portal when its route is opened, and says it is loading meanwhile', async () => {
     let finish: (module: { default: ComponentType }) => void = () => undefined;
     renderApp([remote({ id: 'catalog', label: 'Catálogo', load: () => new Promise((resolve) => (finish = resolve)) })], '/catalog');
