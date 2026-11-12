@@ -1,0 +1,72 @@
+/*
+ * The tokens of the design system (12-ux-ui/design-system.md in amaranta-shop-docs, ADR-007 "Fiery Ocean"), as custom
+ * properties. They are global on purpose: the shell defines them once and every portal loaded into it uses them, so the
+ * whole application changes colour in one place.
+ *
+ * Below the brand tokens are the semantic ones the components use. Where the design system's own pairing fails WCAG AA
+ * (it says the contrast was never audited), the semantic token picks the next tone of the SAME palette that passes:
+ *   - white on ocean-500 is 3.3:1, so the "Agregar" button is ocean-600 (4.8:1), and ocean-700 when hovered;
+ *   - the error red #ef4444 on white is 3.8:1, so error text is ember-600 (8:1);
+ *   - a field's border at 15% ink is 1.3:1, so it is 60% ink (4.1:1 on white): the edge of a control needs 3:1;
+ *   - the secondary button's ember-300 border is 2.2:1 on the cream, so it is ember-400 (3.4:1).
+ * src/styles/design.test.ts checks every pair.
+ */
+:root {
+  /* Primary: ember */
+  --color-ember-50: #fdf1ee;
+  --color-ember-100: #fbe0d8;
+  --color-ember-200: #f3b8ac;
+  --color-ember-300: #e8887a;
+  --color-ember-400: #d85a4a;
+  --color-ember-500: #c41e2e;
+  --color-ember-600: #a01522;
+  --color-ember-700: #7a0e17;
+  --color-ember-800: #5c0a10;
+  --color-ember-900: #3d0709;
+
+  /* Secondary: ocean */
+  --color-ocean-50: #eef5fa;
+  --color-ocean-100: #dcebf5;
+  --color-ocean-200: #b7d7ea;
+  --color-ocean-300: #93c0da;
+  --color-ocean-400: #79a9c9;
+  --color-ocean-500: #5c93b8;
+  --color-ocean-600: #457897;
+  --color-ocean-700: #345d75;
+
+  /* Background and text. Never pure black. */
+  --color-cream-50: #fbeeda;
+  --color-cream-100: #f5e2c4;
+  --color-ink-900: #0e2a3d;
+  --color-ink-muted: #506169;
+
+  /* Type */
+  --font-family-display: 'Fredoka Variable', system-ui, sans-serif;
+  --font-family-sans: 'Inter Variable', system-ui, sans-serif;
+
+  /* Shape and depth */
+  --radius-lg: 8px;
+  --radius-xl2: 20px;
+  --radius-full: 9999px;
+  --shadow-card: 0 8px 24px -8px rgba(61, 7, 9, 0.2);
+
+  /* Semantic */
+  --surface: #ffffff;
+  --link: var(--color-ember-500);
+  --link-hover: var(--color-ember-700);
+  --btn-primary-bg: var(--color-ember-500);
+  --btn-primary-bg-hover: var(--color-ember-600);
+  --btn-secondary-text: var(--color-ember-500);
+  --btn-secondary-border: var(--color-ember-400);
+  --btn-add-bg: var(--color-ocean-600);
+  --btn-add-bg-hover: var(--color-ocean-700);
+  --field-border: #6e7f8b;
+  --field-error: var(--color-ember-600);
+  --alert-error-bg: var(--color-ember-50);
+  --alert-error-text: var(--color-ember-700);
+  --alert-error-border: var(--color-ember-300);
+  --alert-success-bg: var(--color-ocean-50);
+  --alert-success-text: var(--color-ocean-700);
+  --alert-success-border: var(--color-ocean-200);
+  --focus-ring: var(--color-ocean-700);
+}
