@@ -14,7 +14,7 @@ export function App({ remotes }: { remotes: readonly RemoteDefinition[] }) {
   return (
     <Routes>
       <Route element={<Shell remotes={remotes} />}>
-        <Route index element={<Home />} />
+        <Route index element={<Home remotes={remotes} />} />
         <Route path="sign-in" element={<DevSignIn />} />
         {remotes.map((remote) => {
           const portal = <RemotePortal key={remote.id} remote={remote} />;
