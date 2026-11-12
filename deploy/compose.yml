@@ -1,0 +1,18 @@
+# The shell only. amaranta-shop-infra-postgres includes this file to compose the platform.
+# It is the entry of the people (the browser opens :4200); everything it needs from the server goes through the gateway.
+name: amaranta-shop-front
+
+services:
+  front:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: serve
+    ports: ["4200:4200"]
+    restart: unless-stopped
+    networks: [platform]
+
+networks:
+  platform:
+    name: platform
+    external: true
