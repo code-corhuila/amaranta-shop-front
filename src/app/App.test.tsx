@@ -49,6 +49,21 @@ describe('App', () => {
     expect(within(link).getByText('3')).toBeInTheDocument();
   });
 
+  it('marks the cart link as the place a product flies to, so a portal can animate toward it without knowing the shell', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(screen.getByRole('link', { name: 'Carrito' })).toHaveAttribute('data-cart-target');
+  });
+
+  it('draws the count again every time it changes, so that it can jump when the product lands', () => {
+    const cart = createCartStore({ storage: null });
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    act(() => void cart.add(croquetas));
+    const first = within(screen.getByRole('link', { name: 'Carrito, 1 producto' })).getByText('1');
+    act(() => void cart.add(croquetas));
+    const second = within(screen.getByRole('link', { name: 'Carrito, 2 productos' })).getByText('2');
+    expect(second).not.toBe(first);
+  });
+
   it('has no cart where there is no sales portal to take it to', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' })]);
     expect(screen.queryByRole('link', { name: /^Carrito/ })).not.toBeInTheDocument();
@@ -60,6 +75,19 @@ describe('App', () => {
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByRole('link', { name: 'Catálogo' })).toHaveAttribute('href', '/catalog');
     expect(within(nav).getByRole('link', { name: 'Ventas' })).toHaveAttribute('href', '/sales');
+  });
+
+  it('has no "Inicio" link: the name of the shop takes you home, and the welcome offers the catalog', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(within(screen.getByRole('navigation')).queryByRole('link', { name: 'Inicio' })).not.toBeInTheDocument();
+    expect(within(screen.getByRole('heading', { name: /amaranta shop/i })).getByRole('link')).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Ver el catálogo' })).toHaveAttribute('href', '/catalog');
+  });
+
+  it('keeps the cart out of the header, so it can float over every page', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    expect(within(screen.getByRole('banner')).queryByRole('link', { name: 'Carrito' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Carrito' })).toBeInTheDocument();
   });
 
   it('loads a portal when its route is opened, and says it is loading meanwhile', async () => {

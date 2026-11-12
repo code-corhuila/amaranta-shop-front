@@ -69,11 +69,16 @@ white, 3.8:1) and two borders failed 3:1 for a control (a field's 15% ink border
 brand colours are the ones the design system names and that every pair the components draw is readable, and it fails if the
 original values come back.
 
-### The development sign-in
+### Signing in
 
-`DevSignIn` lets a developer paste a token from the security service. It exists **only while `import.meta.env.DEV` is true**
-(Annex H, rule 5): a production build has no way in through it, and it is replaced by the identity portal before anything
-reaches `main`.
+`/sign-in` (`src/core/auth/SignIn.tsx`) has two ways in: email and password for whoever has an account, and a short form
+(name, email, password) to create one. It asks the gateway for `POST /api/v1/auth/login` or `/register`, and the token that
+comes back goes to the session store, the only place that keeps it. A self-service account is **always a customer**: the form
+has no role field and the identity service would ignore one. An administrator lands on the administration, anyone else on
+the catalog, and a person sent here by a protected route goes back to it.
+
+Until the security service is extracted, the monolith still answers as `identity` (ADR-011, point 9). `DevSignIn`, the form
+that pasted a token, stays in the code for its tests but is no longer routed.
 
 ## How to run
 
