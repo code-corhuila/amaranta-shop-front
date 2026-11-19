@@ -39,7 +39,7 @@ describe('App', () => {
 
   it('shows the cart beside who is signed in, with how many units it holds, said in words for a screen reader', () => {
     const cart = createCartStore({ storage: null });
-    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog', cart);
     expect(screen.getByRole('link', { name: 'Carrito' })).toHaveAttribute('href', '/sales/cart');
 
     act(() => void cart.add(croquetas));
@@ -50,18 +50,28 @@ describe('App', () => {
   });
 
   it('marks the cart link as the place a product flies to, so a portal can animate toward it without knowing the shell', () => {
-    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog');
     expect(screen.getByRole('link', { name: 'Carrito' })).toHaveAttribute('data-cart-target');
   });
 
   it('draws the count again every time it changes, so that it can jump when the product lands', () => {
     const cart = createCartStore({ storage: null });
-    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog', cart);
     act(() => void cart.add(croquetas));
     const first = within(screen.getByRole('link', { name: 'Carrito, 1 producto' })).getByText('1');
     act(() => void cart.add(croquetas));
     const second = within(screen.getByRole('link', { name: 'Carrito, 2 productos' })).getByText('2');
     expect(second).not.toBe(first);
+  });
+
+  it('shows no cart over the welcome, and shows it as soon as the person goes in', async () => {
+    const cart = createCartStore({ storage: null });
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/', cart);
+    act(() => void cart.add(croquetas));
+    expect(screen.queryByRole('link', { name: /^Carrito/ })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('link', { name: /bienvenido/i }));
+    expect(await screen.findByRole('link', { name: 'Carrito, 1 producto' })).toHaveAttribute('href', '/sales/cart');
   });
 
   it('has no cart where there is no sales portal to take it to', () => {
@@ -131,7 +141,7 @@ describe('App', () => {
   });
 
   it('keeps the cart out of the header, so it can float over every page', () => {
-    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog');
     expect(within(screen.getByRole('banner')).queryByRole('link', { name: 'Carrito' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Carrito' })).toBeInTheDocument();
   });

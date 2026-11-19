@@ -56,7 +56,9 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
   const session = useSession();
   const store = useSessionStore();
   const { count } = useCart();
-  const nav = navFor(remotes, session?.role ?? null, useLocation().pathname === '/');
+  // The welcome is only the welcome: no menu entry for the catalog (its button is there) and no cart floating over the photographs.
+  const onWelcome = useLocation().pathname === '/';
+  const nav = navFor(remotes, session?.role ?? null, onWelcome);
   // The cart is taken to the sales portal, wherever the registry mounts it.
   const sales = remotes.find((remote) => remote.id === 'sales');
 
@@ -96,7 +98,7 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
       <main className="app-main">
         <Outlet />
       </main>
-      {sales && (
+      {sales && !onWelcome && (
         // A round button that floats at the right edge of the screen, on every page. data-cart-target: where a product flies
         // to when it is added (the catalog portal looks for this attribute).
         <Link to={`${sales.path}/cart`} className="cart-link" data-cart-target aria-label={count === 0 ? 'Carrito' : `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}`}>
