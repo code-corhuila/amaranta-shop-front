@@ -4,9 +4,10 @@ import { UsersPage } from '../admin/UsersPage';
 import { RequireAuth } from '../core/auth/RequireAuth';
 import { RequireRole } from '../core/auth/RequireRole';
 import { SignIn } from '../core/auth/SignIn';
-import { Home, NotFound } from '../layout/Pages';
+import { NotFound } from '../layout/Pages';
 import { RemotePortal } from '../layout/RemotePortal';
 import { Shell } from '../layout/Shell';
+import { Welcome } from '../layout/Welcome';
 import type { RemoteDefinition } from '../remotes/types';
 
 /**
@@ -17,7 +18,7 @@ export function App({ remotes }: { remotes: readonly RemoteDefinition[] }) {
   return (
     <Routes>
       <Route element={<Shell remotes={remotes} />}>
-        <Route index element={<Home remotes={remotes} />} />
+        <Route index element={<Welcome remotes={remotes} />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route
           path="admin"

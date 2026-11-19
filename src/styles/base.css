@@ -127,6 +127,7 @@ img {
 
 .app-session {
   display: flex;
+  margin-left: auto;
   align-items: center;
   gap: 0.75rem;
   font-size: 0.875rem;
@@ -214,55 +215,6 @@ img {
 }
 
 /* ---- the way in: the welcome of the shell -------------------------------------------------------------------- */
-.home-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-  padding: clamp(2rem, 6vw, 4rem) clamp(1.5rem, 5vw, 3.5rem);
-  border-radius: var(--radius-xl2);
-  background: var(--gradient-hero);
-  color: var(--surface);
-  box-shadow: var(--shadow-lift);
-}
-
-.home-hero h2 {
-  max-width: 18ch;
-  margin: 0.25rem 0 0.5rem;
-  color: var(--surface);
-  font-size: clamp(2rem, 6vw, 3.25rem);
-}
-
-.home-kicker {
-  margin: 0;
-  color: var(--surface);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.home-lead {
-  max-width: 34rem;
-  margin: 0 0 1.25rem;
-  color: var(--surface);
-  font-size: 1.125rem;
-}
-
-/* On the blue of the hero the call to action is white, so it is the brightest thing on the page. */
-.home-cta.btn-primary {
-  border-color: var(--surface);
-  background: var(--surface);
-  color: var(--brand-700);
-  font-size: 1.125rem;
-  padding: 0.75rem 1.75rem;
-}
-
-.home-cta.btn-primary:hover {
-  background: var(--brand-50);
-  border-color: var(--brand-50);
-}
-
 /* ---- buttons: the default is the secondary one; the others are named ------------------------------------------ */
 button,
 .btn {
