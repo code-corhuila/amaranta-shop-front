@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { roleLabel } from '../core/auth/roles';
 import { useSession, useSessionStore } from '../core/auth/SessionProvider';
 import { useCart } from '../core/cart/useCart';
@@ -34,10 +34,13 @@ interface NavItem {
  * What each person is offered, by who they are. A visitor browses (and buys from the cart that floats on every page); a customer
  * also has their orders; the administrator runs the shop, so that is what they are offered, and not the cart of a customer.
  * The services check the role again on every request: this only spares a person the doors that are not theirs.
+ *
+ * On the welcome the catalog is not in the menu: the button of the welcome is the way in, and saying it twice only crowds it.
  */
-function navFor(remotes: readonly RemoteDefinition[], role: string | null): NavItem[] {
+function navFor(remotes: readonly RemoteDefinition[], role: string | null, onWelcome: boolean): NavItem[] {
   const items: NavItem[] = [];
   for (const remote of remotes) {
+    if (remote.id === 'catalog' && onWelcome) continue;
     if (remote.id !== 'sales') {
       items.push({ to: remote.path, label: remote.label });
     } else if (role !== null && role !== 'ADMIN') {
@@ -53,6 +56,7 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
   const session = useSession();
   const store = useSessionStore();
   const { count } = useCart();
+  const nav = navFor(remotes, session?.role ?? null, useLocation().pathname === '/');
   // The cart is taken to the sales portal, wherever the registry mounts it.
   const sales = remotes.find((remote) => remote.id === 'sales');
 
@@ -63,13 +67,16 @@ export function Shell({ remotes }: { remotes: readonly RemoteDefinition[] }) {
         <h1 className="app-brand">
           <Link to="/">Amaranta Shop</Link>
         </h1>
-        <nav aria-label="Principal" className="app-nav">
-          {navFor(remotes, session?.role ?? null).map((item) => (
-            <NavLink key={item.to} to={item.to}>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+        {/* No menu at all when there is nothing in it: an empty navigation is noise for a screen reader. */}
+        {nav.length > 0 && (
+          <nav aria-label="Principal" className="app-nav">
+            {nav.map((item) => (
+              <NavLink key={item.to} to={item.to}>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
         <div className="app-session">
           {session ? (
             <>

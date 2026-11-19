@@ -70,7 +70,7 @@ describe('App', () => {
   });
 
   it('names the application and offers a visitor the catalog, and nothing that needs a person', () => {
-    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog');
     expect(screen.getByRole('heading', { name: /amaranta shop/i, level: 1 })).toBeInTheDocument();
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByRole('link', { name: 'Catálogo' })).toHaveAttribute('href', '/catalog');
@@ -89,13 +89,33 @@ describe('App', () => {
   });
 
   it('offers the administrator the administration, and not the orders of a customer', async () => {
-    const session = renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    const session = renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog');
     session.signIn(validToken({ role: 'ADMIN' }));
     const nav = within(await screen.findByRole('navigation'));
     expect(await nav.findByRole('link', { name: 'Administración' })).toHaveAttribute('href', '/admin');
     expect(nav.getByRole('link', { name: 'Catálogo' })).toBeInTheDocument();
     expect(nav.queryByRole('link', { name: 'Mis pedidos' })).not.toBeInTheDocument();
     expect(nav.queryByRole('link', { name: 'Ventas' })).not.toBeInTheDocument();
+  });
+
+  it('does not repeat the catalog in the menu on the welcome, where the button already is: a visitor has no menu there at all', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/');
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Catálogo' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /bienvenido/i })).toHaveAttribute('href', '/catalog');
+  });
+
+  it('keeps what is not the catalog in the menu on the welcome: the administrator still has the administration', async () => {
+    const session = renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/');
+    session.signIn(validToken({ role: 'ADMIN' }));
+    const nav = within(await screen.findByRole('navigation'));
+    expect(await nav.findByRole('link', { name: 'Administración' })).toBeInTheDocument();
+    expect(nav.queryByRole('link', { name: 'Catálogo' })).not.toBeInTheDocument();
+  });
+
+  it('puts the catalog back in the menu on every other page', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })], '/catalog');
+    expect(within(screen.getByRole('navigation')).getByRole('link', { name: 'Catálogo' })).toHaveAttribute('href', '/catalog');
   });
 
   it('draws the way in as a button a person can see', () => {
@@ -105,7 +125,7 @@ describe('App', () => {
 
   it('has no "Inicio" link: the name of the shop takes you home, and the welcome offers the catalog', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
-    expect(within(screen.getByRole('navigation')).queryByRole('link', { name: 'Inicio' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Inicio' })).not.toBeInTheDocument();
     expect(within(screen.getByRole('heading', { name: /amaranta shop/i, level: 1 })).getByRole('link')).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: /bienvenido/i })).toHaveAttribute('href', '/catalog');
   });
