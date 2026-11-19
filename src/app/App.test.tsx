@@ -69,12 +69,38 @@ describe('App', () => {
     expect(screen.queryByRole('link', { name: /^Carrito/ })).not.toBeInTheDocument();
   });
 
-  it('names the application and offers each portal in the navigation', () => {
+  it('names the application and offers a visitor the catalog, and nothing that needs a person', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
     expect(screen.getByRole('heading', { name: /amaranta shop/i })).toBeInTheDocument();
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByRole('link', { name: 'Catálogo' })).toHaveAttribute('href', '/catalog');
-    expect(within(nav).getByRole('link', { name: 'Ventas' })).toHaveAttribute('href', '/sales');
+    expect(within(nav).queryByRole('link', { name: 'Ventas' })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('link', { name: 'Mis pedidos' })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('link', { name: 'Administración' })).not.toBeInTheDocument();
+  });
+
+  it('offers a customer their orders, and not the administration', async () => {
+    const session = renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    session.signIn(validToken({ role: 'CUSTOMER' }));
+    const nav = within(await screen.findByRole('navigation'));
+    expect(await nav.findByRole('link', { name: 'Mis pedidos' })).toHaveAttribute('href', '/sales');
+    expect(nav.queryByRole('link', { name: 'Administración' })).not.toBeInTheDocument();
+    expect(screen.getByText('Cliente')).toBeInTheDocument();
+  });
+
+  it('offers the administrator the administration, and not the orders of a customer', async () => {
+    const session = renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
+    session.signIn(validToken({ role: 'ADMIN' }));
+    const nav = within(await screen.findByRole('navigation'));
+    expect(await nav.findByRole('link', { name: 'Administración' })).toHaveAttribute('href', '/admin');
+    expect(nav.getByRole('link', { name: 'Catálogo' })).toBeInTheDocument();
+    expect(nav.queryByRole('link', { name: 'Mis pedidos' })).not.toBeInTheDocument();
+    expect(nav.queryByRole('link', { name: 'Ventas' })).not.toBeInTheDocument();
+  });
+
+  it('draws the way in as a button a person can see', () => {
+    renderApp([remote({ id: 'catalog', label: 'Catálogo' })]);
+    expect(screen.getByRole('link', { name: /iniciar sesión/i })).toHaveClass('btn-pill', 'btn-pill-primary');
   });
 
   it('has no "Inicio" link: the name of the shop takes you home, and the welcome offers the catalog', () => {
@@ -112,7 +138,7 @@ describe('App', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('El módulo Catálogo no está disponible');
     expect(screen.getByRole('navigation')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('link', { name: 'Ventas' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Carrito' }));
     expect(await screen.findByText('Portal sales')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
@@ -133,16 +159,16 @@ describe('App', () => {
   });
 
   it('sends a visitor who opens a portal that needs a session to the sign-in', async () => {
-    renderApp([remote({ id: 'admin', label: 'Administración', requiresSession: true })], '/admin');
+    renderApp([remote({ id: 'clinic', label: 'Clínica', requiresSession: true })], '/clinic');
     expect(await screen.findByRole('heading', { name: /iniciar sesión/i })).toBeInTheDocument();
-    expect(screen.queryByText('Portal admin')).not.toBeInTheDocument();
+    expect(screen.queryByText('Portal clinic')).not.toBeInTheDocument();
   });
 
   it('shows who is signed in and lets them sign out', async () => {
     const session = renderApp([remote({ id: 'catalog' })]);
     expect(screen.getByRole('link', { name: /iniciar sesión/i })).toBeInTheDocument();
     session.signIn(validToken({ role: 'ADMIN' }));
-    expect(await screen.findByText(/ADMIN/)).toBeInTheDocument();
+    expect(await screen.findByText('Administrador')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /cerrar sesión/i }));
     expect(session.getSession()).toBeNull();
     expect(await screen.findByRole('link', { name: /iniciar sesión/i })).toBeInTheDocument();

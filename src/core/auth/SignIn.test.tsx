@@ -22,7 +22,7 @@ function renderSignIn(client: ApiClient, path = '/sign-in') {
         <Routes>
           <Route path="/sign-in" element={<SignIn client={client} />} />
           <Route path="/catalog" element={<p>Catálogo abierto</p>} />
-          <Route path="/catalog/admin" element={<p>Administración abierta</p>} />
+          <Route path="/admin" element={<p>Administración abierta</p>} />
         </Routes>
       </MemoryRouter>
     </SessionProvider>,
@@ -48,7 +48,7 @@ describe('SignIn', () => {
     expect(session.getSession()?.role).toBe('CUSTOMER');
   });
 
-  it('takes an administrator to the administration', async () => {
+  it('takes an administrator to the administration home', async () => {
     renderSignIn(clientThatAnswers(vi.fn().mockResolvedValue(answer('ADMIN'))));
     await fill(/correo/i, 'admin@correo.com');
     await fill(/contraseña/i, 'clave-segura-1');

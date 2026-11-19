@@ -87,7 +87,7 @@ export function SignIn({ client }: { client?: ApiClient }) {
       const answer = await api.post<AuthAnswer>(mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register', body);
       store.signIn(answer.data.accessToken);
       const role = store.getSession()?.role;
-      void navigate(from ? `${from.pathname}${from.search ?? ''}` : role === 'ADMIN' ? '/catalog/admin' : '/catalog', { replace: true });
+      void navigate(from ? `${from.pathname}${from.search ?? ''}` : role === 'ADMIN' ? '/admin' : '/catalog', { replace: true });
     } catch (cause) {
       if (cause instanceof SessionError) setFailure('No pudimos iniciar tu sesión. Inténtalo de nuevo.');
       else setFailure(messageFor(mode, cause));
