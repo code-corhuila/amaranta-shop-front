@@ -12,12 +12,17 @@ interface AuthAnswer {
   readonly accessToken: string;
 }
 
+const PHONE = /^\d{10}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** What is wrong with the form before it is sent, field by field; an empty object means it can go. */
-function validate(mode: Mode, values: { fullName: string; email: string; password: string }): Record<string, string> {
+function validate(mode: Mode, values: { fullName: string; email: string; password: string; phone: string }): Record<string, string> {
   const problems: Record<string, string> = {};
   if (mode === 'register' && values.fullName.trim().length < 2) problems['fullName'] = 'Escribe tu nombre (mínimo 2 letras).';
+  // Optional, but if it is given it must be a mobile number as the identity service keeps it: ten digits.
+  if (mode === 'register' && values.phone.trim() !== '' && !PHONE.test(values.phone.trim())) {
+    problems['phone'] = 'Escribe tu celular con 10 dígitos, sin espacios ni signos, o déjalo vacío.';
+  }
   if (!EMAIL.test(values.email.trim())) problems['email'] = 'Escribe un correo válido, por ejemplo ana@correo.com.';
   if (mode === 'register' ? values.password.length < 8 : values.password === '') {
     problems['password'] = mode === 'register' ? 'La contraseña debe tener al menos 8 caracteres.' : 'Escribe tu contraseña.';
@@ -72,6 +77,7 @@ export function SignIn({ client }: { client?: ApiClient }) {
       fullName: String(data.get('fullName') ?? ''),
       email: String(data.get('email') ?? ''),
       password: String(data.get('password') ?? ''),
+      phone: String(data.get('phone') ?? ''),
     };
     const found = validate(mode, values);
     setProblems(found);
@@ -83,7 +89,12 @@ export function SignIn({ client }: { client?: ApiClient }) {
       const body =
         mode === 'login'
           ? { email: values.email.trim(), password: values.password }
-          : { fullName: values.fullName.trim(), email: values.email.trim(), password: values.password };
+          : {
+              fullName: values.fullName.trim(),
+              email: values.email.trim(),
+              password: values.password,
+              ...(values.phone.trim() !== '' ? { phone: values.phone.trim() } : {}),
+            };
       const answer = await api.post<AuthAnswer>(mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register', body);
       store.signIn(answer.data.accessToken);
       const role = store.getSession()?.role;
@@ -132,6 +143,29 @@ export function SignIn({ client }: { client?: ApiClient }) {
             </p>
           )}
         </div>
+        {registering && (
+          <div className="field">
+            <label htmlFor="phone">Celular (opcional)</label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              aria-invalid={problems['phone'] !== undefined}
+              aria-describedby={problems['phone'] ? 'phone-error' : 'phone-hint'}
+            />
+            {problems['phone'] ? (
+              <p id="phone-error" className="field-error">
+                {problems['phone']}
+              </p>
+            ) : (
+              <p id="phone-hint" className="field-hint">
+                Para avisarte de tu pedido. 10 dígitos, sin espacios.
+              </p>
+            )}
+          </div>
+        )}
         <div className="field">
           <label htmlFor="password">Contraseña</label>
           <input
