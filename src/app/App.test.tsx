@@ -71,7 +71,7 @@ describe('App', () => {
 
   it('names the application and offers a visitor the catalog, and nothing that needs a person', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
-    expect(screen.getByRole('heading', { name: /amaranta shop/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /amaranta shop/i, level: 1 })).toBeInTheDocument();
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByRole('link', { name: 'Catálogo' })).toHaveAttribute('href', '/catalog');
     expect(within(nav).queryByRole('link', { name: 'Ventas' })).not.toBeInTheDocument();
@@ -106,8 +106,8 @@ describe('App', () => {
   it('has no "Inicio" link: the name of the shop takes you home, and the welcome offers the catalog', () => {
     renderApp([remote({ id: 'catalog', label: 'Catálogo' }), remote({ id: 'sales', label: 'Ventas' })]);
     expect(within(screen.getByRole('navigation')).queryByRole('link', { name: 'Inicio' })).not.toBeInTheDocument();
-    expect(within(screen.getByRole('heading', { name: /amaranta shop/i })).getByRole('link')).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: 'Ver el catálogo' })).toHaveAttribute('href', '/catalog');
+    expect(within(screen.getByRole('heading', { name: /amaranta shop/i, level: 1 })).getByRole('link')).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: /bienvenido/i })).toHaveAttribute('href', '/catalog');
   });
 
   it('keeps the cart out of the header, so it can float over every page', () => {
@@ -155,7 +155,7 @@ describe('App', () => {
     renderApp([remote({ id: 'catalog' })], '/nada-por-aqui');
     expect(screen.getByRole('heading', { name: /404/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('link', { name: /volver al inicio/i }));
-    expect(screen.getByRole('heading', { name: /amaranta shop/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /amaranta shop/i, level: 2 })).toBeInTheDocument();
   });
 
   it('sends a visitor who opens a portal that needs a session to the sign-in', async () => {

@@ -1,0 +1,280 @@
+/*
+ * The welcome: a whole screen with photographs of pets behind the name of the shop, one line and one button. It is decoration
+ * and motion only; every colour is a token of tokens.css, so the blue changes in one place. The photographs fade into each
+ * other with nothing but CSS, and a person who asks for less motion gets the first one, still.
+ */
+
+/* On the welcome the page is not a column: the picture goes edge to edge, under the header. */
+.app-main:has(> .welcome) {
+  width: 100%;
+  padding: 0;
+}
+
+.welcome {
+  /* --slide (seconds a photograph stays) and --slides (how many) come from Welcome.tsx. */
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: calc(100svh - 5rem);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--gradient-hero);
+  color: var(--surface);
+  text-align: center;
+}
+
+/* ---- the photographs --------------------------------------------------------------------------------------------- */
+.welcome-slides {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+}
+
+.welcome-slide {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  /* Each one starts a slide after the one before, and a little early, so they cross instead of leaving a gap. */
+  animation: welcome-slide calc(var(--slide) * var(--slides)) linear infinite;
+  animation-delay: calc(var(--i) * var(--slide) - 1.5s);
+  will-change: opacity, transform;
+}
+
+@keyframes welcome-slide {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  4% {
+    opacity: 1;
+  }
+  18% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+/* The blue over the photographs: dark enough for white words to be read on any of them, light enough to see the animal. */
+.welcome-veil {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse at center, color-mix(in srgb, var(--color-ocean-700) 48%, transparent) 0%, color-mix(in srgb, var(--color-ocean-700) 78%, transparent) 100%),
+    linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--color-ocean-700) 70%, transparent) 100%);
+}
+
+/* ---- the paw prints that float up behind the words ------------------------------------------------------------------ */
+.welcome-paw {
+  position: absolute;
+  z-index: -1;
+  width: clamp(2.5rem, 6vw, 4.5rem);
+  fill: var(--surface);
+  opacity: 0;
+  animation: welcome-paw 9s ease-in-out infinite;
+}
+
+.welcome-paw-1 {
+  left: 8%;
+  bottom: 12%;
+  animation-delay: 0s;
+}
+
+.welcome-paw-2 {
+  left: 82%;
+  bottom: 20%;
+  animation-delay: 2.5s;
+  transform: rotate(18deg);
+}
+
+.welcome-paw-3 {
+  left: 24%;
+  bottom: 6%;
+  animation-delay: 5s;
+  transform: rotate(-14deg);
+}
+
+.welcome-paw-4 {
+  left: 66%;
+  bottom: 8%;
+  animation-delay: 7s;
+}
+
+@keyframes welcome-paw {
+  0% {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+  25% {
+    opacity: 0.22;
+  }
+  75% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -8rem;
+  }
+}
+
+/* ---- the words ---------------------------------------------------------------------------------------------------- */
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 44rem;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.welcome-title {
+  margin: 0;
+  color: var(--surface);
+  font-size: clamp(3rem, 11vw, 7rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 24px color-mix(in srgb, var(--color-ocean-700) 70%, transparent);
+  animation: welcome-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.welcome-lead {
+  max-width: 32rem;
+  margin: 0;
+  color: var(--surface);
+  font-size: clamp(1.0625rem, 2.6vw, 1.375rem);
+  text-shadow: 0 2px 12px color-mix(in srgb, var(--color-ocean-700) 70%, transparent);
+  animation: welcome-rise 0.9s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes welcome-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- the button ---------------------------------------------------------------------------------------------------- */
+.welcome-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 1rem 2.25rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--brand-700);
+  font-family: var(--font-family-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-lift);
+  /* It breathes while nobody touches it, so the eye finds it. */
+  animation:
+    welcome-rise 0.9s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    welcome-breathe 2.8s 1.6s ease-in-out infinite;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+/* A band of light that crosses the button when the pointer arrives. */
+.welcome-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--color-ocean-200) 80%, transparent) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.welcome-cta:hover {
+  background: var(--brand-50);
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 28px 64px -16px color-mix(in srgb, var(--color-ocean-700) 80%, transparent);
+  animation-play-state: running, paused;
+}
+
+.welcome-cta:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
+}
+
+.welcome-cta:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.welcome-arrow {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.welcome-cta:hover .welcome-arrow {
+  transform: translateX(8px);
+}
+
+@keyframes welcome-breathe {
+  50% {
+    box-shadow: 0 0 0 0.75rem color-mix(in srgb, var(--surface) 22%, transparent), var(--shadow-lift);
+  }
+}
+
+.welcome-credit {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.75rem;
+  margin: 0;
+  color: color-mix(in srgb, var(--surface) 75%, transparent);
+  font-size: 0.75rem;
+}
+
+/* ---- a small screen -------------------------------------------------------------------------------------------------- */
+@media (max-width: 40rem) {
+  .welcome-cta {
+    padding: 0.875rem 1.75rem;
+    font-size: 1.25rem;
+  }
+
+  .welcome-paw-2,
+  .welcome-paw-4 {
+    display: none;
+  }
+}
+
+/* ---- less motion for whoever asks for it: the first photograph, still, and the words where they go ------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .welcome-slide {
+    animation: none;
+    transform: none;
+  }
+
+  .welcome-slide:first-child {
+    opacity: 1;
+  }
+
+  .welcome-paw {
+    display: none;
+  }
+
+  .welcome-title,
+  .welcome-lead,
+  .welcome-cta {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .welcome-cta:hover {
+    transform: none;
+  }
+}
