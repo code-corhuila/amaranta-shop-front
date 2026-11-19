@@ -4,8 +4,19 @@
  * other with nothing but CSS, and a person who asks for less motion gets the first one, still.
  */
 
-/* On the welcome the page is not a column: the picture goes edge to edge, under the header. */
+/*
+ * On the welcome the page is not a column: the picture goes edge to edge, under the header, and fills what is left of the
+ * screen whatever the height of the header is (it wraps on a small screen), so there is never a strip of page below it.
+ */
+#root:has(.welcome) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
 .app-main:has(> .welcome) {
+  display: flex;
+  flex: 1;
   width: 100%;
   padding: 0;
 }
@@ -14,8 +25,9 @@
   /* --slide (seconds a photograph stays) and --slides (how many) come from Welcome.tsx. */
   position: relative;
   display: grid;
+  flex: 1;
   place-items: center;
-  min-height: calc(100svh - 5rem);
+  min-height: 28rem;
   overflow: hidden;
   isolation: isolate;
   background: var(--gradient-hero);
@@ -231,7 +243,7 @@
 
 .welcome-credit {
   position: absolute;
-  right: 1rem;
+  left: 1rem;
   bottom: 0.75rem;
   margin: 0;
   color: color-mix(in srgb, var(--surface) 75%, transparent);
