@@ -22,7 +22,7 @@ function renderSignIn(client: ApiClient, path = '/sign-in') {
         <Routes>
           <Route path="/sign-in" element={<SignIn client={client} />} />
           <Route path="/catalog" element={<p>Catálogo abierto</p>} />
-          <Route path="/catalog/admin" element={<p>Administración abierta</p>} />
+          <Route path="/admin" element={<p>Administración abierta</p>} />
         </Routes>
       </MemoryRouter>
     </SessionProvider>,
@@ -48,7 +48,7 @@ describe('SignIn', () => {
     expect(session.getSession()?.role).toBe('CUSTOMER');
   });
 
-  it('takes an administrator to the administration', async () => {
+  it('takes an administrator to the administration home', async () => {
     renderSignIn(clientThatAnswers(vi.fn().mockResolvedValue(answer('ADMIN'))));
     await fill(/correo/i, 'admin@correo.com');
     await fill(/contraseña/i, 'clave-segura-1');
@@ -100,5 +100,43 @@ describe('SignIn', () => {
     await fill(/contraseña/i, 'clave-segura-1');
     await userEvent.click(screen.getByRole('button', { name: /^entrar$/i }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/no hay conexión/i);
+  });
+
+  it('asks for a phone when creating an account, and sends it only when it was given', async () => {
+    const post = vi.fn().mockResolvedValue(answer('CUSTOMER'));
+    renderSignIn(clientThatAnswers(post));
+    await userEvent.click(screen.getByRole('button', { name: /soy nuevo/i }));
+    await fill(/nombre completo/i, 'Ana Torres');
+    await fill(/correo/i, 'ana@correo.com');
+    await fill(/celular/i, '3001234567');
+    await fill(/contraseña/i, 'clave-segura-1');
+    await userEvent.click(screen.getByRole('button', { name: /crear mi cuenta/i }));
+    expect(await screen.findByText('Catálogo abierto')).toBeInTheDocument();
+    expect(post).toHaveBeenCalledWith('/api/v1/auth/register', {
+      fullName: 'Ana Torres',
+      email: 'ana@correo.com',
+      password: 'clave-segura-1',
+      phone: '3001234567',
+    });
+  });
+
+  it('does not ask for a phone to sign in', async () => {
+    renderSignIn(clientThatAnswers(vi.fn()));
+    expect(screen.queryByLabelText(/celular/i)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /soy nuevo/i }));
+    expect(screen.getByLabelText(/celular/i)).toBeInTheDocument();
+  });
+
+  it('refuses a phone that is not ten digits, next to its field, and sends nothing', async () => {
+    const post = vi.fn();
+    renderSignIn(clientThatAnswers(post));
+    await userEvent.click(screen.getByRole('button', { name: /soy nuevo/i }));
+    await fill(/nombre completo/i, 'Ana Torres');
+    await fill(/correo/i, 'ana@correo.com');
+    await fill(/celular/i, '300 123');
+    await fill(/contraseña/i, 'clave-segura-1');
+    await userEvent.click(screen.getByRole('button', { name: /crear mi cuenta/i }));
+    expect(screen.getByLabelText(/celular/i)).toHaveAccessibleDescription(/10 dígitos/i);
+    expect(post).not.toHaveBeenCalled();
   });
 });

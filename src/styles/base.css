@@ -474,3 +474,166 @@ textarea:focus {
   width: 100%;
   margin-top: 0.5rem;
 }
+
+/* ---- the pills of the header: sign in, sign out and who you are ---------------------------------------------------- */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-pill-primary {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.btn-pill-primary:hover {
+  background: var(--gradient-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.btn-pill-primary:active {
+  transform: translateY(0);
+}
+
+.btn-pill-quiet {
+  border-color: var(--brand-600);
+  background: transparent;
+  color: var(--brand-700);
+}
+
+.btn-pill-quiet:hover:not(:disabled) {
+  background: var(--brand-50);
+}
+
+.role-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--brand-100);
+  color: var(--brand-700);
+  font-weight: 600;
+}
+
+/* ---- the administration -------------------------------------------------------------------------------------------- */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 1.5rem;
+  border-radius: var(--radius-xl2);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-ink-900);
+  text-decoration: none;
+  border-top: 6px solid transparent;
+  border-image: var(--gradient-primary) 1;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+.admin-card h3 {
+  margin: 0;
+  color: var(--brand-700);
+}
+
+.admin-card p {
+  margin: 0;
+  flex: 1;
+}
+
+.admin-card-count {
+  font-family: var(--font-family-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--brand-600);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-xl2);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap caption {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-family: var(--font-family-display);
+  font-weight: 600;
+  color: var(--brand-700);
+}
+
+.table-wrap th,
+.table-wrap td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid var(--color-cream-100);
+}
+
+.table-wrap thead th {
+  background: var(--brand-50);
+  color: var(--brand-700);
+  font-size: 0.875rem;
+}
+
+.table-wrap tbody tr:hover {
+  background: var(--color-cream-50);
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.chip-category {
+  background: var(--color-cream-100);
+  color: var(--color-ink-900);
+}
+
+.chip-stock {
+  background: var(--alert-success-bg);
+  color: var(--alert-success-text);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
